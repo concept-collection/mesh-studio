@@ -48,7 +48,7 @@ src/abcDataset.ts  "Random CAD model" source: fetches index.json from
   quality slider is a dimensionless fraction independent of model scale — no
   bounding-box computation needed. `retessellate` calls `BRepTools.Clean` first
   (in a try/catch) so a finer deflection actually refines.
-- **The "Random CAD model" button** (primary, top of Sources) downloads a real
+- **The "Random CAD model" button** (primary, below Open STEP/IGES) downloads a real
   ABC-dataset STEP file and runs it through `importCadFile` — the quickest
   end-to-end check of the CAD import path (needs network + the abc-step-1000
   Pages site). The old "Sample STEP" round-trip button was removed 2026-07-09;

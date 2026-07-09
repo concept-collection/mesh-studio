@@ -196,20 +196,6 @@ function App() {
 
         <section>
           <h2>Sources</h2>
-          <button
-            className="primary"
-            onClick={() => void loadRandomAbc()}
-            disabled={busy !== null}
-            title="Download a random CAD model from the first 1000 STEP files of the ABC dataset"
-          >
-            🎲 Random CAD model
-          </button>
-          <p className="footnote">
-            Random models are drawn from{' '}
-            <a href="https://concept-collection.github.io/abc-step-1000/">abc-step-1000</a>, a
-            rehosted slice of the <a href={ABC_DATASET_URL}>ABC dataset</a> of CAD models (Koch et
-            al., CVPR 2019).
-          </p>
           <div className="primitive-grid">
             {primitives.map((p) => (
               <button
@@ -227,6 +213,20 @@ function App() {
               Open STEP/IGES…
             </button>
           </div>
+          <button
+            className="primary"
+            onClick={() => void loadRandomAbc()}
+            disabled={busy !== null}
+            title="Download a random CAD model from the first 1000 STEP files of the ABC dataset"
+          >
+            Random CAD model
+          </button>
+          <p className="footnote">
+            Random models are drawn from{' '}
+            <a href="https://concept-collection.github.io/abc-step-1000/">abc-step-1000</a>, a
+            rehosted slice of the <a href={ABC_DATASET_URL}>ABC dataset</a> of CAD models (Koch et
+            al., CVPR 2019).
+          </p>
           <input
             ref={fileInputRef}
             type="file"
