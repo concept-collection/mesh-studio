@@ -30,6 +30,10 @@ extracts those polynomial patches (control points, weights, knots, degree)
 - **STEP / IGES import**: open a `.step`/`.stp` or `.iges`/`.igs` file — OCCT
   reads it natively. "Sample STEP" round-trips a box through OCCT's own writer +
   reader to demonstrate the import path with no bundled file.
+- **Random CAD model**: downloads a random real-world model from
+  [abc-step-1000](https://concept-collection.github.io/abc-step-1000/), a
+  rehosted slice of the [ABC dataset](https://deep-geometry.github.io/abc-dataset/)
+  of CAD models (Koch et al., CVPR 2019).
 
 ## Export
 

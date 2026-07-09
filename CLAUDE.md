@@ -23,6 +23,10 @@ src/render/    SurfaceView.tsx: plain three.js, one mesh per patch (for picking)
 src/export/    meshWriters.ts (OBJ/PLY/STL, dependency-free), nurbsJson.ts.
 src/App.tsx    sidebar + viewport; keeps the OpenCascade instance and the
                (NURBS-converted) mesh shape in refs for re-tessellation.
+src/abcDataset.ts  "Random CAD model" source: fetches index.json from
+               https://concept-collection.github.io/abc-step-1000/ (first 1000
+               ABC-dataset STEP files, gzip-served), picks a random file ≤2 MB,
+               gunzips via DecompressionStream, hands bytes to importCadFile.
 ```
 
 ## Key gotchas
@@ -56,6 +60,8 @@ bundling (including the OCCT wasm asset). Then `npm run dev` and:
 - drag the resolution slider (faceting should visibly change);
 - click a face → the inspector shows degree / poles / knots;
 - "Sample STEP" and a real uploaded STEP/IGES both render;
+- "Random CAD model" downloads from abc-step-1000 and renders (needs that
+  Pages site up, and the network);
 - export OBJ/PLY/STL/NURBS-JSON/STEP.
 
 Not yet deployed to the org Pages site (same procedure as mesh-converter /

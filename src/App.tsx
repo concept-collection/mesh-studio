@@ -11,6 +11,7 @@ import { importCadFile } from './occ/importCad'
 import { shapeToStep } from './occ/exportCad'
 import { makeBox } from './occ/primitives'
 import { primitives } from './sources'
+import { ABC_DATASET_URL, fetchRandomAbcStep } from './abcDataset'
 import { toOBJ, toPLY, toSTL } from './export/meshWriters'
 import { toNurbsJson } from './export/nurbsJson'
 import './index.css'
@@ -114,6 +115,23 @@ function App() {
     )
   }
 
+  const loadRandomAbc = async () => {
+    setError(null)
+    setBusy('downloading')
+    try {
+      const { name, bytes } = await fetchRandomAbcStep()
+      await load(
+        (oc) => importCadFile(oc, name, bytes).shape,
+        { kind: 'step', label: `${name} (ABC dataset)` },
+        name.replace(/\.[^.]+$/, ''),
+        { format: 'step', bytes },
+      )
+    } catch (e) {
+      setError(e instanceof Error ? e.message : String(e))
+      setBusy(null)
+    }
+  }
+
   const openFile = async (file: File) => {
     const bytes = new Uint8Array(await file.arrayBuffer())
     const lower = file.name.toLowerCase()
@@ -211,7 +229,20 @@ function App() {
             <button onClick={loadSampleStep} disabled={busy !== null}>
               Sample STEP
             </button>
+            <button
+              onClick={() => void loadRandomAbc()}
+              disabled={busy !== null}
+              title="Download a random CAD model from the first 1000 STEP files of the ABC dataset"
+            >
+              Random CAD model
+            </button>
           </div>
+          <p className="footnote">
+            Random models are drawn from{' '}
+            <a href="https://concept-collection.github.io/abc-step-1000/">abc-step-1000</a>, a
+            rehosted slice of the <a href={ABC_DATASET_URL}>ABC dataset</a> of CAD models (Koch et
+            al., CVPR 2019).
+          </p>
           <input
             ref={fileInputRef}
             type="file"
@@ -223,7 +254,11 @@ function App() {
               e.target.value = ''
             }}
           />
-          {busy && <div className="busy">{busy === 'building' ? 'Building model…' : 'Re-meshing…'}</div>}
+          {busy && (
+            <div className="busy">
+              {busy === 'building' ? 'Building model…' : busy === 'downloading' ? 'Downloading model…' : 'Re-meshing…'}
+            </div>
+          )}
           {error && <div className="error">{error}</div>}
         </section>
 
