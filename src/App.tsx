@@ -9,7 +9,6 @@ import type { OpenCascade, Shape } from './occ/types'
 import { buildModel, retessellate } from './occ/extract'
 import { importCadFile } from './occ/importCad'
 import { shapeToStep } from './occ/exportCad'
-import { makeBox } from './occ/primitives'
 import { primitives } from './sources'
 import { ABC_DATASET_URL, fetchRandomAbcStep } from './abcDataset'
 import { toOBJ, toPLY, toSTL } from './export/meshWriters'
@@ -100,19 +99,6 @@ function App() {
     const src = primitives.find((p) => p.id === id)
     if (!src) return
     void load(src.build, { kind: 'primitive', label: src.label }, src.id)
-  }
-
-  // Round-trips a box through OCCT's STEP writer + reader to exercise the
-  // import pipeline without shipping a bundled file.
-  const loadSampleStep = () => {
-    void load(
-      (oc) => {
-        const bytes = shapeToStep(oc, makeBox(oc))
-        return importCadFile(oc, 'sample.step', bytes).shape
-      },
-      { kind: 'step', label: 'sample.step (generated)' },
-      'sample',
-    )
   }
 
   const loadRandomAbc = async () => {
@@ -210,6 +196,20 @@ function App() {
 
         <section>
           <h2>Sources</h2>
+          <button
+            className="primary"
+            onClick={() => void loadRandomAbc()}
+            disabled={busy !== null}
+            title="Download a random CAD model from the first 1000 STEP files of the ABC dataset"
+          >
+            🎲 Random CAD model
+          </button>
+          <p className="footnote">
+            Random models are drawn from{' '}
+            <a href="https://concept-collection.github.io/abc-step-1000/">abc-step-1000</a>, a
+            rehosted slice of the <a href={ABC_DATASET_URL}>ABC dataset</a> of CAD models (Koch et
+            al., CVPR 2019).
+          </p>
           <div className="primitive-grid">
             {primitives.map((p) => (
               <button
@@ -226,23 +226,7 @@ function App() {
             <button onClick={() => fileInputRef.current?.click()} disabled={busy !== null}>
               Open STEP/IGES…
             </button>
-            <button onClick={loadSampleStep} disabled={busy !== null}>
-              Sample STEP
-            </button>
-            <button
-              onClick={() => void loadRandomAbc()}
-              disabled={busy !== null}
-              title="Download a random CAD model from the first 1000 STEP files of the ABC dataset"
-            >
-              Random CAD model
-            </button>
           </div>
-          <p className="footnote">
-            Random models are drawn from{' '}
-            <a href="https://concept-collection.github.io/abc-step-1000/">abc-step-1000</a>, a
-            rehosted slice of the <a href={ABC_DATASET_URL}>ABC dataset</a> of CAD models (Koch et
-            al., CVPR 2019).
-          </p>
           <input
             ref={fileInputRef}
             type="file"

@@ -48,9 +48,11 @@ src/abcDataset.ts  "Random CAD model" source: fetches index.json from
   quality slider is a dimensionless fraction independent of model scale — no
   bounding-box computation needed. `retessellate` calls `BRepTools.Clean` first
   (in a try/catch) so a finer deflection actually refines.
-- **The "Sample STEP" button** round-trips a box through `shapeToStep` +
-  `importCadFile` — it exercises the whole STEP export+import pipeline with no
-  bundled asset, and is the quickest end-to-end check of the CAD path.
+- **The "Random CAD model" button** (primary, top of Sources) downloads a real
+  ABC-dataset STEP file and runs it through `importCadFile` — the quickest
+  end-to-end check of the CAD import path (needs network + the abc-step-1000
+  Pages site). The old "Sample STEP" round-trip button was removed 2026-07-09;
+  STEP export is still exercised via Export → STEP.
 
 ## Verification
 
@@ -59,9 +61,8 @@ bundling (including the OCCT wasm asset). Then `npm run dev` and:
 - load each primitive; toggle shaded / wireframe / control-net / isocurves;
 - drag the resolution slider (faceting should visibly change);
 - click a face → the inspector shows degree / poles / knots;
-- "Sample STEP" and a real uploaded STEP/IGES both render;
-- "Random CAD model" downloads from abc-step-1000 and renders (needs that
-  Pages site up, and the network);
+- "Random CAD model" downloads from abc-step-1000 and renders (needs the
+  network); an uploaded STEP/IGES file renders;
 - export OBJ/PLY/STL/NURBS-JSON/STEP.
 
 Not yet deployed to the org Pages site (same procedure as mesh-converter /
