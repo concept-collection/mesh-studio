@@ -19,7 +19,9 @@ src/model/     types.ts: SurfaceModel = list of Patch (discriminated union).
                v1 emits `nurbs` patches. tessellate.ts: pure geometry helpers
                (modelBounds, controlNet, mergeTriMeshes) — no three, no OCCT.
 src/render/    SurfaceView.tsx: plain three.js, one mesh per patch (for picking),
-               modes shaded/wire/net/iso. palette.ts: per-face colors.
+               modes shaded/wire/net/iso, optional red/cyan anaglyph
+               (AnaglyphEffect; planeDistance/eyeSep tracked to orbit distance —
+               the defaults double the image). palette.ts: per-face colors.
 src/export/    meshWriters.ts (OBJ/PLY/STL, dependency-free), nurbsJson.ts.
 src/App.tsx    sidebar + viewport; keeps the OpenCascade instance and the
                (NURBS-converted) mesh shape in refs for re-tessellation.
@@ -58,7 +60,8 @@ src/abcDataset.ts  "Random CAD model" source: fetches index.json from
 
 Browser is the real verification surface (WASM). `npm run build` confirms TS +
 bundling (including the OCCT wasm asset). Then `npm run dev` and:
-- load each primitive; toggle shaded / wireframe / control-net / isocurves;
+- load each primitive; toggle shaded / wireframe / control-net / isocurves and
+  the 3D (anaglyph) button — all in the overlay at the viewport's upper right;
 - drag the resolution slider (faceting should visibly change);
 - click a face → the inspector shows degree / poles / knots;
 - "Random CAD model" downloads from abc-step-1000 and renders (needs the

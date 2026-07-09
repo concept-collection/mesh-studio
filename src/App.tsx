@@ -54,6 +54,7 @@ function App() {
   const [baseName, setBaseName] = useState('model')
   const [quality, setQuality] = useState(0.5)
   const [mode, setMode] = useState<ViewMode>('shaded')
+  const [anaglyph, setAnaglyph] = useState(false)
   const [selectedFaceId, setSelectedFaceId] = useState<number | null>(null)
   const [exportId, setExportId] = useState<ExportId>('obj')
   const [busy, setBusy] = useState<string | null>(null)
@@ -267,17 +268,6 @@ function App() {
         {model && (
           <section>
             <h2>View</h2>
-            <div className="view-toolbar">
-              {VIEW_MODES.map((m) => (
-                <button
-                  key={m.id}
-                  className={mode === m.id ? 'active' : ''}
-                  onClick={() => setMode(m.id)}
-                >
-                  {m.label}
-                </button>
-              ))}
-            </div>
             <label className="slider">
               <span>Mesh resolution</span>
               <input
@@ -350,9 +340,34 @@ function App() {
         <SurfaceView
           model={model}
           mode={mode}
+          anaglyph={anaglyph}
           selectedFaceId={selectedFaceId}
           onSelectFace={setSelectedFaceId}
         />
+        {model && (
+          <div className="view-overlay">
+            <div className="view-toolbar">
+              {VIEW_MODES.map((m) => (
+                <button
+                  key={m.id}
+                  className={mode === m.id ? 'active' : ''}
+                  onClick={() => setMode(m.id)}
+                >
+                  {m.label}
+                </button>
+              ))}
+            </div>
+            <div className="view-toolbar">
+              <button
+                className={anaglyph ? 'active' : ''}
+                onClick={() => setAnaglyph((a) => !a)}
+                title="Red/cyan anaglyph stereo (needs 3D glasses)"
+              >
+                3D
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   )

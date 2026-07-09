@@ -7,6 +7,7 @@
 import { useEffect, useRef } from 'react'
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
+import { AnaglyphEffect } from 'three/examples/jsm/effects/AnaglyphEffect.js'
 import type { Patch, SurfaceModel } from '../model/types'
 import { controlNet, modelBounds } from '../model/tessellate'
 import { faceColor, ISO_COLOR, NET_COLOR, POLE_COLOR, SELECTED_COLOR } from './palette'
@@ -15,6 +16,7 @@ export type ViewMode = 'shaded' | 'wire' | 'net' | 'iso'
 
 interface SceneState {
   renderer: THREE.WebGLRenderer
+  effect: AnaglyphEffect
   scene: THREE.Scene
   camera: THREE.PerspectiveCamera
   controls: OrbitControls
@@ -126,11 +128,13 @@ function buildContent(
 export function SurfaceView({
   model,
   mode,
+  anaglyph,
   selectedFaceId,
   onSelectFace,
 }: {
   model: SurfaceModel | null
   mode: ViewMode
+  anaglyph: boolean
   selectedFaceId: number | null
   onSelectFace: (id: number | null) => void
 }) {
@@ -138,6 +142,8 @@ export function SurfaceView({
   const stateRef = useRef<SceneState | null>(null)
   const onSelectRef = useRef(onSelectFace)
   onSelectRef.current = onSelectFace
+  const anaglyphRef = useRef(anaglyph)
+  anaglyphRef.current = anaglyph
 
   // set up the scene once
   useEffect(() => {
@@ -148,6 +154,8 @@ export function SurfaceView({
     renderer.setPixelRatio(window.devicePixelRatio)
     renderer.setClearColor(0x161a22)
     container.appendChild(renderer.domElement)
+
+    const effect = new AnaglyphEffect(renderer)
 
     const scene = new THREE.Scene()
     const camera = new THREE.PerspectiveCamera(45, 1, 0.01, 100)
@@ -171,10 +179,20 @@ export function SurfaceView({
 
     const animId = requestAnimationFrame(function loop() {
       controls.update()
-      renderer.render(scene, camera)
+      if (anaglyphRef.current) {
+        // converge the stereo eyes on the orbit target and scale the eye
+        // separation with viewing distance (the defaults — planeDistance 0.5,
+        // eyeSep 0.064 — assume a much closer scene and double the image)
+        const dist = camera.position.distanceTo(controls.target)
+        effect.planeDistance = dist
+        effect.eyeSep = dist / 30
+        effect.render(scene, camera)
+      } else {
+        renderer.render(scene, camera)
+      }
       if (stateRef.current) stateRef.current.animId = requestAnimationFrame(loop)
     })
-    stateRef.current = { renderer, scene, camera, controls, content, raycaster, animId }
+    stateRef.current = { renderer, effect, scene, camera, controls, content, raycaster, animId }
 
     const onPointerDown = (ev: PointerEvent) => {
       const st = stateRef.current
@@ -195,7 +213,8 @@ export function SurfaceView({
     const observer = new ResizeObserver(() => {
       const rect = container.getBoundingClientRect()
       if (rect.width === 0 || rect.height === 0) return
-      renderer.setSize(rect.width, rect.height)
+      // effect.setSize sizes the renderer plus the stereo render targets
+      effect.setSize(rect.width, rect.height)
       camera.aspect = rect.width / rect.height
       camera.updateProjectionMatrix()
     })
@@ -206,6 +225,7 @@ export function SurfaceView({
       renderer.domElement.removeEventListener('pointerdown', onPointerDown)
       cancelAnimationFrame(stateRef.current?.animId ?? animId)
       controls.dispose()
+      effect.dispose()
       renderer.dispose()
       container.removeChild(renderer.domElement)
       stateRef.current = null

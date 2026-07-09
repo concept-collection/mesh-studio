@@ -195,6 +195,24 @@ select {
   overflow: hidden;
 }
 
+.view-overlay {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  display: flex;
+  gap: 8px;
+}
+
+.view-overlay .view-toolbar {
+  flex-wrap: nowrap;
+  background: rgba(30, 33, 40, 0.88);
+}
+
+.view-overlay .view-toolbar button {
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+
 .view-toolbar button {
   flex: 1 1 auto;
   border: none;
